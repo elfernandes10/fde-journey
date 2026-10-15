@@ -54,3 +54,42 @@
 
 ### Questions I'm sitting with
 - (Add your own as they come up)
+
+## Oct 15, 2026 — Day 1 (full day session)
+
+### What I built
+- Clean dev environment on freshly-reset MacBook
+- `hello.py` — first Claude API call, env-based config
+- Repo structure: .gitignore, .env, .env.example, README
+
+### What I learned (conceptually)
+- HTTP: methods, status codes (200, 401, 403, 404, 405, 429)
+- JSON: 6 data types, nested navigation, pretty-printing
+- Client/server pattern — client always speaks first; clients are preconfigured reusable connections
+- Packages, pip, PyPI, dependency trees, sys.path
+- Venvs: isolation per project, PATH manipulation under the hood
+- Env vars: shell-level (~/.zshrc) vs project-level (.env), 12-Factor config
+- API deprecation: aliases vs snapshots, pinning for production
+- Git flow: stage/commit/push, divergent history, rebase vs merge, credential caching
+- Systems view of an API call: load balancer → gateway → auth → authz → rate limit → billing → router → inference → response. Cheap checks before expensive compute. Stateless servers = scalability.
+
+### The near-miss
+- Pasted real API key into `.env.example` by copy-paste
+- Caught by pre-commit `grep -r "sk-ant"` check
+- Revoked key immediately, rotated, verified clean
+- Lesson: real secrets live in exactly ONE file (.env). Never anywhere else. `cat <file>` is ground truth, not the editor.
+
+### DSA diagnostic
+- Started with "I'm bad at DSA; I can word solutions but not code them"
+- Diagnostic: pseudocoded reverse-string correctly, translated to Python correctly
+- Real gap identified: not thinking or algorithm — Python syntax hygiene (case sensitivity, keyword spelling, indentation)
+- Fix: 30 min/day in VS Code with Python extension's red-squiggle feedback. 150-200 problems over 9 months, pseudocode-first always.
+- Reframe: "untrained at Python syntax under pressure," not "bad at DSA"
+
+### Target sharpened
+- AI Systems Engineer at Google (Cloud AI, Vertex AI, Applied ML).
+- Tier-2 landing first likely; Google in 18-month arc; Apple as stretch.
+- Hybrid: design + build + deploy. Not pure research, not pure SA, not just-another-backend.
+
+### Questions I'm sitting with
+- (add your own)
