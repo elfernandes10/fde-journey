@@ -1,0 +1,33 @@
+# Claude's Thinking Blocks — Discovery and Implications
+
+## What I observed
+Set max_tokens=20 with a broad question. The entire budget was consumed by the model's "thinking" phase before any visible answer emerged. The response content was a thinking block + cryptographic signature, no text block.
+
+Retried with max_tokens=500 on same question. Still consumed by thinking.
+
+## What's happening
+Current Claude models (Sonnet 5.5+, Opus 5.5, Fable 5.1) do adaptive internal reasoning before producing visible answers. Reasoning is returned as a signed thinking block for auditability and multi-turn integrity.
+
+## Implications I reasoned through
+- **Compute-cost chain:** complex query → more thinking tokens → more GPU time → more cost on my bill
+- **Cost unpredictability:** same endpoint can have 100-300x cost variance between queries
+- **Latency unpredictability:** thinking adds wall-clock time; blows p95/p99 SLOs
+- **Max_tokens guessing game:** can't set budget correctly without knowing how much the model will think
+
+## Production patterns to handle this
+1. **Model routing:** cheap classifier upstream → route to Haiku vs Sonnet vs Opus by task
+2. **Disable thinking** for latency-critical paths (`thinking: {type: "disabled"}`)
+3. **Explicit stop_reason handling:** never silently truncate; retry, tell user, or log
+4. **Prompt caching:** cuts repeated-prefix input cost by ~90%
+5. **Budget caps with graceful degradation**
+
+## Google-interview framing
+Classic system design problem: build LLM app for N users within $X budget.
+→ requires model routing, caching, thinking budget decisions, degradation plans.
+This is the exact math the interviewer wants to see.
+
+## Open questions
+- Exactly how does prompt caching interact with thinking blocks?
+- What's the signature cryptographic scheme? (Likely HMAC with Anthropic's secret.)
+- Can I force a specific reasoning depth? (effort parameter?)
+- How do other providers' reasoning APIs compare?
