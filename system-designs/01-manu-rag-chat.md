@@ -69,7 +69,19 @@ graph TD
 [For each major box in your diagram, 2-3 sentences on what it does and why it's separate.]
 
 ### 4.1 Web UI
+
+- **What:** Browser-based chat interface where employees type questions and see streamed responses with citations. Sends HTTPS requests to the API Gateway and renders server-sent streaming responses token-by-token.
+- **Why separate:** Frontend concerns (rendering, state management, streaming display) and backend concerns (auth, retrieval, LLM calls) have different scaling, deployment, and security profiles. Separating them lets each layer evolve independently and keeps secrets off the client.
+- **Key design choice:** React + Vercel AI SDK. React is the standard choice for component-based UIs; the Vercel AI SDK handles streaming, conversation state, and tool-use UI patterns out of the box — eliminates ~200 lines of boilerplate we'd otherwise write ourselves.
+- **Doesn't do:** Holds no credentials or API keys (all backend access flows through the gateway), enforces no authorization rules (never trust the client — all permission checks happen server-side), contains no business logic (any logic duplicated here would need to be re-enforced server-side anyway).
+
+
 ### 4.2 API Gateway
+
+- **What:** Front door for all incoming requests. Three jobs: (1) validates session tokens by looking them up in the session store, rejecting any missing/expired tokens with 401; (2) applies per-user rate limits to prevent abuse (DDoS, runaway client bugs, budget overruns); (3) routes requests to the correct downstream service based on URL path prefix matching (`/login` → Auth Service, `/chat` → Orchestrator, etc.).
+- **Why separate:** Single-responsibility — all cross-cutting concerns (auth, rate limiting, routing, request logging) live here so downstream services don't duplicate them. Also gives us one chokepoint to apply global policies (e.g., "all requests must have a trace ID") and one place to update when policies change.
+- **Key design choice:** Kong Gateway for v1 — open-source, battle-tested, plugin ecosystem covers JWT validation, rate limiting, and request logging out of the box. Alternatives (Envoy, AWS API Gateway) deferred unless Kong's single-node performance becomes a bottleneck.
+- **Doesn't do:** Does not perform password authentication (that's the Auth Service's job during login); does not store any credentials or tokens itself (validates session tokens via Redis lookup); does not enforce document-level RBAC (that happens at the retrieval layer, pre-vector-search); does not contain any business logic (never translate, enrich, or interpret request content).
 ### 4.3 Auth Service
 ### 4.4 Orchestrator
 ### 4.5 Retrieval Layer
