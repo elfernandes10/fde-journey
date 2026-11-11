@@ -1,0 +1,74 @@
+# Approach: Two pointers converging from both ends. Skip non-alphanumerics
+#           inline. Compare lowercased chars one at a time. No extra allocation.
+
+# Data:
+#   i: left pointer, starts at 0
+#   j: right pointer, starts at len(s) - 1
+#   s: the input string (unchanged, no new string created)
+
+# Loop:
+#   While i < j:
+#     # Skip non-alphanumerics on the left
+#     While i < j and s[i] is not alphanumeric:
+#       i = i + 1
+    
+#     # Skip non-alphanumerics on the right
+#     While i < j and s[j] is not alphanumeric:
+#       j = j - 1
+    
+#     # Both pointers now on alphanumeric chars (or they've crossed)
+#     If s[i].lower() != s[j].lower():
+#       Return False
+    
+#     i = i + 1
+#     j = j - 1
+
+# Return True   (if loop completes, all compared chars matched)
+
+# Edge cases:
+#   - Empty string: j = -1, outer condition false, returns True.
+#   - Single char: i = j = 0, outer condition false, returns True.
+#   - All non-alphanumeric (",,,,"): inner skips drive i past j, outer exits, returns True.
+#   - Mixed with punctuation ("a!b!a"): skips handle them naturally.
+
+# Complexity:
+#   Time: O(n) — each character visited at most twice (once by i, once by j).
+#   Space: O(1) — only two integer pointers; no new string allocated.
+
+def is_palindrome(s: str) -> bool:
+    i = 0
+    j = len(s) - 1
+    
+    while i < j:
+        # Skip non-alphanumerics on the left
+        while i < j and not s[i].isalnum():
+            i += 1
+        
+        # Skip non-alphanumerics on the right
+        while i < j and not s[j].isalnum():
+            j -= 1
+        
+        # Compare lowercased chars
+        if s[i].lower() != s[j].lower():
+            return False
+        
+        i, j = i + 1, j - 1
+    
+    return True
+
+if __name__ == "__main__":
+    # From the problem
+    assert is_palindrome("A man, a plan, a canal: Panama") == True, "Classic palindrome failed"
+    assert is_palindrome("race a car") == False, "Classic non-palindrome failed"
+    assert is_palindrome(" ") == True, "Single space should be True (empty after filter)"
+    assert is_palindrome(".,") == True, "All punctuation should be True (empty after filter)"
+    assert is_palindrome("0P") == False, "0 vs p should be False"
+    
+    # My own edge cases
+    assert is_palindrome("a") == True, "Single char should be True"
+    assert is_palindrome("ab") == False, "Two different chars should be False"
+    assert is_palindrome("aa") == True, "Two same chars should be True"
+    assert is_palindrome("Aa") == True, "Case-insensitive two chars"
+    assert is_palindrome("12321") == True, "Number palindrome"
+    
+    print("All tests passed!")

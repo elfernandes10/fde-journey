@@ -244,3 +244,19 @@ Modern caveat: the line has blurred. Postgres with JSONB columns covers many doc
 **For Google interviews:**
 - When asked "design X's data model," always reason about which fields need to be normalized (likely to change, referenced by many) vs denormalized (truly owned, rarely changes)
 - Example: LinkedIn's user.region → normalize (region names change, used by many). User.date_of_birth → store directly (immutable, owned by that user).
+
+Network Model:
+CODASYL was introduced by various database vendors 
+It was a generalization of the hierarchy model. where each element had only one parent. For example lot of people live in the greater seattle area. So all of these people would point towards the memory where Greater Seattle area as a string is stored.This allowed many to one and many to many relationship. The way to access these elements was through a access path from root.
+
+This was similar to the traversal of the linked list. However as a developer handling many to many relationship, it was hard to keep track of multiple access paths.All of this led to a very complicated query and scripts.
+
+Relational Model:
+lays out data flat as set of tuples. The user can decide what data they want to see and multiple conditions and filters can be easily created. The query optimizer decides which part of the query to execute and in which order.if a certain modification in the process is required then developer can specifiy it in the code. For example-using a different index.
+
+Schema on Read VS Schema on Write.
+
+Document DB's follow a schema on read method where nothing is implicitly defined however users have no idea what they would see in the document. Where as schema on write is more specific to databases where its mandatory to follow the number of columns already defined during DDL setup.
+
+For example- If a developer want to track first name and last name seperately, then in a Document DB, they will just track for newer records and the application code can have a split function to retrieve first name from full name in application code. However Relational DB need to run a alter schema script which could lead to downtimes. 
+
